@@ -33,36 +33,36 @@ import java.lang.annotation.*;
 @Inherited
 public @interface ApiMethod {
     /**
-     * ????
+     * 名称
      *
-     * @return
+     *
      */
     String title();
 
     /**
-     * ???????
-     * @return
+     * 详细描述
+     *
      */
     String[] description() default "";
 
     /**
-     * ????
+     * 路径
      *
-     * @return
+     *
      */
     String path();
 
     /**
-     * ????
-     * @return
+     * 方法
+     *
      */
     ApiHttpMethod method();
 
     boolean disabled() default false;
 
     /**
-     * ?????????????? {status : '',data :'',message}
-     * @return
+     * 正常返回格式，即 {status : '',data :'',message}
+     *
      */
     boolean common() default true;
 }
