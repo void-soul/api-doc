@@ -126,7 +126,7 @@ this is a verv complex demo
 1. open `http://127.0.0.1:848?appname=appname&version=version`(node server path) on chrome
 2. input your username/password,then you can see:
 
-![Alt text](apidoc/doc/screencapture-doc-emeker-1510654151737.png)
+![Alt text](https://github.com/d925529/apidoc/blob/master/doc/screencapture-doc-emeker-1510654151737.png?raw=true)
 
 
 
