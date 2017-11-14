@@ -25,7 +25,7 @@ import com.github.d925529.apidoc.ApiHttpMethod;
 import java.lang.annotation.*;
 
 /**
- * ????
+ * 方法
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -65,4 +65,6 @@ public @interface ApiMethod {
      *
      */
     boolean common() default true;
+
+    String version() default "";
 }

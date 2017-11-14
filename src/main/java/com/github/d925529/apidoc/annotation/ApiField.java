@@ -59,4 +59,6 @@ public @interface ApiField {
      * map元素 value 的类型是List时，必须指定集合元素的类型： elementType
      */
     Class<?> elementType() default byte.class;
+
+    String version() default "";
 }

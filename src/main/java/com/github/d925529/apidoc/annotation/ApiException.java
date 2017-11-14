@@ -50,4 +50,6 @@ public @interface ApiException {
      *
      */
     boolean disabled() default false;
+
+    String version() default "";
 }

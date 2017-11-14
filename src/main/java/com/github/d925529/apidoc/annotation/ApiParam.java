@@ -72,4 +72,6 @@ public @interface ApiParam {
      * 用来指明map的K-V
      */
     ApiMap[] maps() default {};
+
+    String version() default "";
 }

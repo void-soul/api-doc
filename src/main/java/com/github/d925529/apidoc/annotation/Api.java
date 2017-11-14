@@ -58,4 +58,6 @@ public @interface Api {
     String group() default "";
 
     boolean disabled() default false;
+
+    String version() default "";
 }

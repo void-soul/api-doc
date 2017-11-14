@@ -68,4 +68,6 @@ public @interface ApiMap {
      * 是否废弃
      */
     boolean disabled() default false;
+
+    String version() default "";
 }
