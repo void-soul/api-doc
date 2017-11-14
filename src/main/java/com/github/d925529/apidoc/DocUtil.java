@@ -244,7 +244,7 @@ public class DocUtil {
         headers.put("authorization", "");
 
         String result = doPost(path, headers, params);
-        log.info("提交API数据完毕,返回 : {}", result);
+        log.info("提交API数据完毕,返回 : {},请浏览 {}?appname={}&version={}", result, path, appname, version);
     }
 
     private static String doPost(String path, Map<String, String> headers, Map<String, Object> params) {
@@ -457,6 +457,7 @@ public class DocUtil {
     private static boolean isEmpty(String str) {
         return str == null || str.length() == 0;
     }
+
     private static boolean isNotEmpty(String str) {
         return !isEmpty(str);
     }

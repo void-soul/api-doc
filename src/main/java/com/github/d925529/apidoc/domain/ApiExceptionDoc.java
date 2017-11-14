@@ -26,13 +26,22 @@ public class ApiExceptionDoc {
     private String code;
     private String[] description;
     private boolean disabled;
+    private String version;
 
     public ApiExceptionDoc(ApiException exception){
         this.setDisabled(exception.disabled());
         this.setCode(exception.code());
         this.setDescription(exception.description());
+        this.setVersion(exception.version());
     }
 
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     public String getCode() {
         return code;

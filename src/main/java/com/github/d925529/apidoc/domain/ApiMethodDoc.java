@@ -35,6 +35,7 @@ public class ApiMethodDoc {
     private boolean common;
     private List<ApiParamDoc> params;
     private List<ApiExceptionDoc> exceptions;
+    private String version;
 
 
     public ApiMethodDoc(ApiMethod method, String name){
@@ -45,6 +46,15 @@ public class ApiMethodDoc {
         this.setDisabled(method.disabled());
         this.setMethod(method.method().name());
         this.setCommon(method.common());
+        this.setVersion(method.version());
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public boolean isCommon() {

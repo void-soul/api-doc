@@ -32,6 +32,7 @@ public class ApiDoc {
     private String group;
     private boolean disabled;
     private List<ApiMethodDoc> methods;
+    private String version;
 
 
     public ApiDoc(Api api,String name){
@@ -41,6 +42,15 @@ public class ApiDoc {
         this.setGroup(api.group());
         this.setName(name);
         this.setPath(api.path());
+        this.setVersion(api.version());
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public List<ApiMethodDoc> getMethods() {

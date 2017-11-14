@@ -35,6 +35,7 @@ public class ApiParamDoc {
     private String elementType;
     private List<ApiParamDoc> children;
     private transient Class<?> t;
+    private String version;
 
 
     public ApiParamDoc(ApiMap param) {
@@ -45,11 +46,12 @@ public class ApiParamDoc {
         this.setDisabled(param.disabled());
         this.setType(param.type().getName());
         this.setElementType(param.elementType().getName());
-        if(param.type().isAssignableFrom(List.class)){
+        if (param.type().isAssignableFrom(List.class)) {
             this.setT(param.elementType());
-        }else{
+        } else {
             this.setT(param.type());
         }
+        this.setVersion(param.version());
     }
 
     public ApiParamDoc(ApiMap2 param) {
@@ -60,11 +62,12 @@ public class ApiParamDoc {
         this.setDisabled(param.disabled());
         this.setType(param.type().getName());
         this.setElementType(param.elementType().getName());
-        if(param.type().isAssignableFrom(List.class)){
+        if (param.type().isAssignableFrom(List.class)) {
             this.setT(param.elementType());
-        }else{
+        } else {
             this.setT(param.type());
         }
+        this.setVersion(param.version());
     }
 
     public ApiParamDoc(ApiMap3 param) {
@@ -75,11 +78,12 @@ public class ApiParamDoc {
         this.setDisabled(param.disabled());
         this.setType(param.type().getName());
         this.setElementType(param.elementType().getName());
-        if(param.type().isAssignableFrom(List.class)){
+        if (param.type().isAssignableFrom(List.class)) {
             this.setT(param.elementType());
-        }else{
+        } else {
             this.setT(param.type());
         }
+        this.setVersion(param.version());
     }
 
 
@@ -91,11 +95,12 @@ public class ApiParamDoc {
         this.setDisabled(param.disabled());
         this.setType(param.type().getName());
         this.setElementType(param.elementType().getName());
-        if(param.type().isAssignableFrom(List.class)){
+        if (param.type().isAssignableFrom(List.class)) {
             this.setT(param.elementType());
-        }else{
+        } else {
             this.setT(param.type());
         }
+        this.setVersion(param.version());
     }
 
 
@@ -107,9 +112,10 @@ public class ApiParamDoc {
             this.setRequired(apiField.required());
             this.setDisabled(apiField.disabled());
             this.setElementType(apiField.elementType().getName());
-            if(field.getType().isAssignableFrom(List.class)){
+            if (field.getType().isAssignableFrom(List.class)) {
                 this.setT(apiField.elementType());
             }
+            this.setVersion(apiField.version());
         } else {
             this.setTitle(field.getName());
             this.setRequired(true);
@@ -124,13 +130,22 @@ public class ApiParamDoc {
         this.setType(apiReturn.type().getName());
         this.setElementType(apiReturn.elementType().getName());
         this.setRequired(true);
-        if(apiReturn.type().isAssignableFrom(List.class)){
+        if (apiReturn.type().isAssignableFrom(List.class)) {
             this.setT(apiReturn.elementType());
-        }else{
+        } else {
             this.setT(apiReturn.type());
         }
+        this.setVersion(apiReturn.version());
     }
 
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     public Class<?> getT() {
         return t;
