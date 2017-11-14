@@ -23,7 +23,7 @@ limitations under the License.
 import java.lang.annotation.*;
 
 /**
- * ???
+ * 接口
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -31,29 +31,29 @@ import java.lang.annotation.*;
 @Inherited
 public @interface Api {
     /**
-     * ????
+     * 名称
      *
-     * @return
+     *
      */
     String title();
 
     /**
-     * ???????
-     * @return
+     * 详细描述
+     *
      */
     String[] description() default "";
 
     /**
-     * ????????
+     * 访问路径
      *
-     * @return
+     *
      */
     String path() default "";
 
     /**
-     * ????
+     * 分组
      *
-     * @return
+     *
      */
     String group() default "";
 

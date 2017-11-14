@@ -23,7 +23,7 @@ limitations under the License.
 import java.lang.annotation.*;
 
 /**
- * ?????
+ * 接口异常
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -32,18 +32,22 @@ import java.lang.annotation.*;
 @Repeatable($ApiExceptions.class)
 public @interface ApiException {
     /**
-     * ????
+     * 描述
      *
-     * @return
+     *
      */
     String[] description() default "";
 
     /**
-     * ??????
+     * 错误码
      *
-     * @return
+     *
      */
     String code() default "";
 
+    /**
+     * 禁用
+     *
+     */
     boolean disabled() default false;
 }

@@ -22,38 +22,41 @@ limitations under the License.
 
 import java.lang.annotation.*;
 
+/**
+ * 字段
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
 public @interface ApiField {
     /**
-     * ????
+     * 描述
      */
     String value() default "";
 
     /**
-     * ???????
+     * 详细描述
      */
     String[] description() default "";
 
     /**
-     * ????
+     * 禁用
      */
     boolean disabled() default false;
 
     /**
-     * ????????????
+     * 必传、必定返回
      */
     boolean required() default true;
 
     /**
-     * ???
+     * 略过
      */
     boolean deprecated() default false;
 
     /**
-     * map??? value ????????List??????????????????????? elementType
+     * map元素 value 的类型是List时，必须指定集合元素的类型： elementType
      */
     Class<?> elementType() default byte.class;
 }
