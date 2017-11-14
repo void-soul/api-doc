@@ -2,27 +2,43 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.mk</groupId>
-    <artifactId>ul-tron-api</artifactId>
-    <version>0.4.0</version>
+    <groupId>com.github.d925529</groupId>
+    <artifactId>apidoc</artifactId>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
-    <name>ul-tron-api</name>
-    <description>edc-java</description>
+    <name>apidoc</name>
+    <description>apidoc</description>
     <inceptionYear>2017</inceptionYear>
     <url>https://github.com/d925529/ul-tron-api</url>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <developers>
+        <developer>
+            <name>d925529</name>
+            <email>a925529@163.com</email>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
 
     <organization>
-        <name>mk</name>
+        <name>emelife</name>
         <url>http://emelife.cn</url>
     </organization>
 
 
     <scm>
-        <connection>scm:git:git@github.com:d925529/ul-tron-api.git</connection>
-        <developerConnection>scm:git:git@github.com:d925529/ul-tron-api.git</developerConnection>
-        <url>git@github.com:d925529/ul-tron-api.git</url>
+        <connection>scm:git:git@github.com:d925529/apidoc.git</connection>
+        <developerConnection>scm:git:git@github.com:d925529/apidoc.git</developerConnection>
+        <url>git@github.com:d925529/apidoc.git</url>
     </scm>
 
     <licenses>
@@ -68,6 +84,30 @@
         <finalName>${project.artifactId}-${project.version}</finalName>
 
         <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -122,10 +162,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.9.1</version>
                 <configuration>
                     <stylesheetfile>src/etc/javadoc.css</stylesheetfile>
-                    <quiet />
+                    <quiet/>
                     <doclet>ch.raffael.doclets.pegdown.PegdownDoclet</doclet>
                     <docletArtifact>
                         <groupId>ch.raffael.pegdown-doclet</groupId>
@@ -150,6 +190,44 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>ossrh</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <gpg.executable>gpg</gpg.executable>
+                <gpg.passphrase>888aaa888</gpg.passphrase>
+            </properties>
+        </profile>
+    </profiles>
 </project>

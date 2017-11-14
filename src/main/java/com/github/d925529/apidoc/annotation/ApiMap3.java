@@ -1,4 +1,4 @@
-package com.mk.apidoc.annotation;
+package com.github.d925529.apidoc.annotation;
 
 /*-
  * #%L
@@ -22,13 +22,43 @@ limitations under the License.
 
 import java.lang.annotation.*;
 
-/**
- * ?????
- */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface $ApiExceptions {
-    ApiException[] value();
+public @interface ApiMap3 {
+    /**
+     * Map ???? K
+     */
+    String name();
+
+    /**
+     * Map ??? K ?????
+     */
+    String title();
+
+    /**
+     * ???????
+     */
+    String[] description() default "";
+
+    /**
+     * ????????/?????????
+     */
+    boolean required() default true;
+
+    /**
+     * map??? value ??????
+     */
+    Class<?> type();
+
+    /**
+     * map??? value ????????List??????????????????????? elementType
+     */
+    Class<?> elementType() default byte.class;
+
+    /**
+     * ??????
+     */
+    boolean disabled() default false;
 }

@@ -1,4 +1,4 @@
-package com.mk.apidoc.domain;
+package com.github.d925529.apidoc.domain;
 
 /*-
  * #%L
@@ -20,7 +20,7 @@ limitations under the License.
  * #L%
  */
 
-import com.mk.apidoc.annotation.*;
+import com.github.d925529.apidoc.annotation.*;
 
 import java.lang.reflect.Field;
 import java.util.List;

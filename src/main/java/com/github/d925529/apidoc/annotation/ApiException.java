@@ -1,4 +1,4 @@
-package com.mk.apidoc;
+package com.github.d925529.apidoc.annotation;
 
 /*-
  * #%L
@@ -20,6 +20,30 @@ limitations under the License.
  * #L%
  */
 
-public enum ApiHttpMethod {
-    GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE
+import java.lang.annotation.*;
+
+/**
+ * ?????
+ */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@Repeatable($ApiExceptions.class)
+public @interface ApiException {
+    /**
+     * ????
+     *
+     * @return
+     */
+    String[] description() default "";
+
+    /**
+     * ??????
+     *
+     * @return
+     */
+    String code() default "";
+
+    boolean disabled() default false;
 }

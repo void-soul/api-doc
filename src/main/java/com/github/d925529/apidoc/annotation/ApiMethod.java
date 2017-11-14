@@ -1,4 +1,4 @@
-package com.mk.apidoc.annotation;
+package com.github.d925529.apidoc.annotation;
 
 /*-
  * #%L
@@ -20,45 +20,49 @@ limitations under the License.
  * #L%
  */
 
+import com.github.d925529.apidoc.ApiHttpMethod;
+
 import java.lang.annotation.*;
 
+/**
+ * ????
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface ApiMap3 {
+public @interface ApiMethod {
     /**
-     * Map ???? K
-     */
-    String name();
-
-    /**
-     * Map ??? K ?????
+     * ????
+     *
+     * @return
      */
     String title();
 
     /**
      * ???????
+     * @return
      */
     String[] description() default "";
 
     /**
-     * ????????/?????????
+     * ????
+     *
+     * @return
      */
-    boolean required() default true;
+    String path();
 
     /**
-     * map??? value ??????
+     * ????
+     * @return
      */
-    Class<?> type();
+    ApiHttpMethod method();
 
-    /**
-     * map??? value ????????List??????????????????????? elementType
-     */
-    Class<?> elementType() default byte.class;
-
-    /**
-     * ??????
-     */
     boolean disabled() default false;
+
+    /**
+     * ?????????????? {status : '',data :'',message}
+     * @return
+     */
+    boolean common() default true;
 }

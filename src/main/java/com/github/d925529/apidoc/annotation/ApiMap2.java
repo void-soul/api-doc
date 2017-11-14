@@ -1,4 +1,4 @@
-package com.mk.apidoc.annotation;
+package com.github.d925529.apidoc.annotation;
 
 /*-
  * #%L

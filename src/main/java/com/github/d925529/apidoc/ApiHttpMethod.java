@@ -1,4 +1,4 @@
-package com.mk.apidoc.annotation;
+package com.github.d925529.apidoc;
 
 /*-
  * #%L
@@ -20,42 +20,6 @@ limitations under the License.
  * #L%
  */
 
-import java.lang.annotation.*;
-
-/**
- * ???
- */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Inherited
-public @interface Api {
-    /**
-     * ????
-     *
-     * @return
-     */
-    String title();
-
-    /**
-     * ???????
-     * @return
-     */
-    String[] description() default "";
-
-    /**
-     * ????????
-     *
-     * @return
-     */
-    String path() default "";
-
-    /**
-     * ????
-     *
-     * @return
-     */
-    String group() default "";
-
-    boolean disabled() default false;
+public enum ApiHttpMethod {
+    GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE
 }

@@ -1,4 +1,4 @@
-package com.mk.apidoc;
+package com.github.d925529.apidoc;
 
 /*-
  * #%L
@@ -21,11 +21,11 @@ limitations under the License.
  */
 
 import com.alibaba.fastjson.JSON;
-import com.mk.apidoc.annotation.*;
-import com.mk.apidoc.domain.ApiDoc;
-import com.mk.apidoc.domain.ApiExceptionDoc;
-import com.mk.apidoc.domain.ApiMethodDoc;
-import com.mk.apidoc.domain.ApiParamDoc;
+import com.github.d925529.apidoc.annotation.*;
+import com.github.d925529.apidoc.domain.ApiDoc;
+import com.github.d925529.apidoc.domain.ApiExceptionDoc;
+import com.github.d925529.apidoc.domain.ApiMethodDoc;
+import com.github.d925529.apidoc.domain.ApiParamDoc;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;

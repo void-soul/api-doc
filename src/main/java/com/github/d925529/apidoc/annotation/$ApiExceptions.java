@@ -1,4 +1,4 @@
-package com.mk.apidoc.annotation;
+package com.github.d925529.apidoc.annotation;
 
 /*-
  * #%L
@@ -29,21 +29,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Repeatable($ApiExceptions.class)
-public @interface ApiException {
-    /**
-     * ????
-     *
-     * @return
-     */
-    String[] description() default "";
-
-    /**
-     * ??????
-     *
-     * @return
-     */
-    String code() default "";
-
-    boolean disabled() default false;
+public @interface $ApiExceptions {
+    ApiException[] value();
 }

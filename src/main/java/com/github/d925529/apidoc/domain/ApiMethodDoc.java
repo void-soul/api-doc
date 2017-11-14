@@ -1,4 +1,4 @@
-package com.mk.apidoc.domain;
+package com.github.d925529.apidoc.domain;
 
 /*-
  * #%L
@@ -20,35 +20,63 @@ limitations under the License.
  * #L%
  */
 
-import com.mk.apidoc.annotation.Api;
+import com.github.d925529.apidoc.annotation.ApiMethod;
 
 import java.util.List;
 
-public class ApiDoc {
+public class ApiMethodDoc {
     private String title;
     private String name;
     private String[] description;
     private String path;
-    private String group;
     private boolean disabled;
-    private List<ApiMethodDoc> methods;
+    private String method;
+    private ApiParamDoc returnValue;
+    private boolean common;
+    private List<ApiParamDoc> params;
+    private List<ApiExceptionDoc> exceptions;
 
 
-    public ApiDoc(Api api,String name){
-        this.setTitle(api.title());
-        this.setDescription(api.description());
-        this.setDisabled(api.disabled());
-        this.setGroup(api.group());
+    public ApiMethodDoc(ApiMethod method, String name){
+        this.setTitle(method.title());
         this.setName(name);
-        this.setPath(api.path());
+        this.setDescription(method.description());
+        this.setPath(method.path());
+        this.setDisabled(method.disabled());
+        this.setMethod(method.method().name());
+        this.setCommon(method.common());
     }
 
-    public List<ApiMethodDoc> getMethods() {
-        return methods;
+    public boolean isCommon() {
+        return common;
     }
 
-    public void setMethods(List<ApiMethodDoc> methods) {
-        this.methods = methods;
+    public void setCommon(boolean common) {
+        this.common = common;
+    }
+
+    public ApiParamDoc getReturnValue() {
+        return returnValue;
+    }
+
+    public void setReturnValue(ApiParamDoc returnValue) {
+        this.returnValue = returnValue;
+    }
+
+    public List<ApiParamDoc> getParams() {
+        return params;
+    }
+
+    public void setParams(List<ApiParamDoc> params) {
+        this.params = params;
+    }
+
+    public List<ApiExceptionDoc> getExceptions() {
+        return exceptions;
+    }
+
+    public void setExceptions(List<ApiExceptionDoc> exceptions) {
+        this.exceptions = exceptions;
     }
 
     public String getTitle() {
@@ -83,19 +111,19 @@ public class ApiDoc {
         this.path = path;
     }
 
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
-    }
-
     public boolean isDisabled() {
         return disabled;
     }
 
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 }
