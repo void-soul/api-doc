@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "formidable": "^1.1.1",
+    "log4js": "^1.1.1",
+    "mime-types": "^2.1.15",
+    "mongoose": "^4.13.2"
+  },
+  "name": "ResServer"
+}
