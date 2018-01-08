@@ -31,7 +31,8 @@
         .el-table__expanded-cell[class*=cell] {
             padding: 10px 20px;
         }
-        .el-alert{
+
+        .el-alert {
             margin: 10px 0;
             font-size: 14px;
         }
@@ -44,22 +45,22 @@
         <el-aside width="300px" v-auto-height>
             <el-switch
                     v-model="i18n"
-                    active-text="看中文提示"
-                    inactive-text="英文">
+                    active-text="中文"
+                    inactive-text="路径">
             </el-switch>
             <el-alert title="<%- appname %>(<%- version %>),<%= description %>" type="success" :closable="false" show-icon style="margin-top: 10px"></el-alert>
 
-            <el-tree v-show="i18n" v-auto-height :data="clzs" :props="props" @node-click="handleNodeClick" ></el-tree>
-            <el-tree v-show="!i18n" v-auto-height :data="clzs" :props="props2" @node-click="handleNodeClick" ></el-tree>
+            <el-tree v-show="i18n" v-auto-height :data="clzs" :props="props" @node-click="handleNodeClick"></el-tree>
+            <el-tree v-show="!i18n" v-auto-height :data="clzs" :props="props2" @node-click="handleNodeClick"></el-tree>
         </el-aside>
         <el-main v-if="method.method">
             <el-tag type="info" v-if="method.disabled">废</el-tag>
-            <el-tag type="danger" v-if="method.version > '<%- version %>'">new</el-tag>
+            <el-tag type="danger" v-if="method.version && method.version >= clz.version">new</el-tag>
             <el-tag>{{method.method}}</el-tag>
             <el-tag>{{method.path}}</el-tag>
-            <el-alert type="info" v-if="method.common" title="返回结果说明" :closable="false" show-icon description="该接口符合标准数据结构，服务将返回{data : 数据,status : 执行结果,message : 错误信息} ; status = 0 时，data = 下述中的 【返回值】,message 无效 ; status != 0 时，data 无效,message 返回 下述【异常】中 status对应的【文字描述】" >
+            <el-alert type="info" v-if="method.common" title="返回结果说明" :closable="false" show-icon description="该接口符合标准数据结构，服务将返回{data : 数据,status : 执行结果,message : 错误信息} ; status = 0 时，data = 下述中的 【返回值】,message 无效 ; status != 0 时，data 无效,message 返回 下述【异常】中 status对应的【文字描述】">
             </el-alert>
-            <el-alert v-else type="warning" show-icon :closable="false" title="【返回结果说明】"  description="该接口是特殊数据结构，服务直接返回下述中【返回值】">
+            <el-alert v-else type="warning" show-icon :closable="false" title="【返回结果说明】" description="该接口是特殊数据结构，服务直接返回下述中【返回值】">
             </el-alert>
             <el-form label-width="60px" size="mini">
                 <el-form-item label="方法：">
@@ -71,15 +72,17 @@
                     </el-row>
                 </el-form-item>
                 <el-form-item label="异常：">
-                    <el-row v-for="(item,index) in method.exceptions" :key="index" style="margin: 0 0 10px 0" >
-                        <el-tag type="danger" v-if="item.version > '<%- version %>'">new</el-tag>
+                    <el-row v-for="(item,index) in method.exceptions" :key="index" style="margin: 0 0 10px 0">
+                        <el-tag type="danger" v-if="item.version && item.version >= method.version">new</el-tag>
                         <el-tag type="danger">{{item.code}}</el-tag>
-                        ：
+                        启动
+                        9:53:04 am
+                        安装爬虫                 ：
                         <el-tag type="info" v-for="(item2,index2) in item.description" :key="index2">{{item2}}</el-tag>
                     </el-row>
                 </el-form-item>
                 <el-form-item label="参数：" v-if="method.params && method.params.length > 0">
-                    <children-params :items="method.params" :version="method.version" ></children-params>
+                    <children-params :items="method.params" :version="method.version"></children-params>
                 </el-form-item>
                 <el-form-item label="返回：" v-if="method.returnValue">
                     <children-params :items="[method.returnValue]" :version="method.version"></children-params>
@@ -96,14 +99,14 @@
 <script type="text/html" id="children-params-temptel">
     <el-table :data="items" stripe border size="mini" highlight-current-row style="width:100%">
         <el-table-column type="expand" prop="name" label="名称">
-            <template slot-scope="scope" >
+            <template slot-scope="scope">
                 <children-params v-if="scope.row.children && scope.row.children.length > 0" :items="scope.row.children" :version="scope.row.version"></children-params>
                 <span v-else></span>
             </template>
         </el-table-column>
         <el-table-column prop="disabled" label="特征&名称" width="280">
             <template slot-scope="scope">
-                <el-tag type="danger" v-if="scope.row.version > version">new</el-tag>
+                <el-tag type="danger" v-if="scope.row.version && scope.row.version >= version">new</el-tag>
                 <el-tag type="danger" v-if="scope.row.children && scope.row.children.length > 0">
                     子
                     <span v-if="scope.row.elementType != 'byte'">{{scope.row.elementType}}</span>
@@ -165,12 +168,12 @@
             }
         },
         components: {
-            'v-js-tree' : window['ue-jstree'],
+            'v-js-tree': window['ue-jstree'],
             'children-params': {
                 name: 'children-params',
                 props: {
                     items: {type: Array},
-                    version : {type : String}
+                    version: {type: String}
                 },
                 template: document.getElementById("children-params-temptel").innerHTML
             }
