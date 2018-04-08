@@ -19,7 +19,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  * #L%
  */
-
+@SuppressWarnings("unused")
 public enum ApiHttpMethod {
     GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE
 }

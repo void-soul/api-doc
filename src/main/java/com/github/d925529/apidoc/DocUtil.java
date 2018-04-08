@@ -21,11 +21,7 @@ limitations under the License.
  */
 
 import com.alibaba.fastjson.JSON;
-import com.github.d925529.apidoc.annotation.*;
 import com.github.d925529.apidoc.domain.ApiDoc;
-import com.github.d925529.apidoc.domain.ApiExceptionDoc;
-import com.github.d925529.apidoc.domain.ApiMethodDoc;
-import com.github.d925529.apidoc.domain.ApiParamDoc;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -40,37 +36,29 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.JarURLConnection;
-import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+@SuppressWarnings("unused")
 public class DocUtil {
     private static final int HTTP_TIMEOUT = 60000;
     private static final String DEFAULT_CHART_SET = "UTF-8";
-    private static final String JSON_TYPE = "application/json";
     private static PoolingHttpClientConnectionManager connMgr;
     private static RequestConfig requestConfig;
     private static final int SUCCESS = 200;
     private static Logger log = LoggerFactory.getLogger("API");
 
     static {
-        // ?????????
         connMgr = new PoolingHttpClientConnectionManager();
-        // ????????????
         connMgr.setMaxTotal(100);
         connMgr.setDefaultMaxPerRoute(connMgr.getMaxTotal());
         RequestConfig.Builder configBuilder = RequestConfig.custom();
-        // ??????????
         configBuilder.setConnectTimeout(HTTP_TIMEOUT);
-        // ?????????
         configBuilder.setSocketTimeout(HTTP_TIMEOUT);
-        // ???????????????????????
         configBuilder.setConnectionRequestTimeout(HTTP_TIMEOUT);
         requestConfig = configBuilder.build();
     }
@@ -83,157 +71,23 @@ public class DocUtil {
      * @param domain
      * @param packageNames
      */
+    @Deprecated
     public static void DocScan(String path, String appname, String version, String description, String domain, String... packageNames) {
-        List<Class<?>> classList = new ArrayList<>();
-        //region 读取class
-        Arrays.asList(packageNames).forEach(packageName -> {
-            //region 读取文件
-            Enumeration<URL> urls = null;
-            try {
-                urls = Thread.currentThread().getContextClassLoader().getResources(packageName.replaceAll("\\.", "/"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            //endregion
-            //region 递归本文件以及子目录
-            while (urls != null && urls.hasMoreElements()) {
-                URL url = urls.nextElement();
-                if (url != null) {
-                    String protocol = url.getProtocol();
-                    //region class文件
-                    if (protocol.equals("file")) {
-                        String packagePath = url.getPath();
-                        addClass(classList, packagePath, packageName);
-                    }
-                    //endregion
-                    //region 包
-                    else if (protocol.equals("jar")) {
-                        JarURLConnection jarURLConnection = null;
-                        try {
-                            jarURLConnection = (JarURLConnection) url.openConnection();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        JarFile jarFile = null;
-                        try {
-                            jarFile = jarURLConnection.getJarFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        Enumeration<JarEntry> jarEntries = jarFile.entries();
-                        //region 循环子包
-                        while (jarEntries.hasMoreElements()) {
-                            JarEntry jarEntry = jarEntries.nextElement();
-                            String jarEntryName = jarEntry.getName();
-                            //读取 class 文件
-                            if (jarEntryName.endsWith(".class")) {
-                                String className = jarEntryName.substring(0, jarEntryName.lastIndexOf(".")).replaceAll("/", ".");
-                                try {
-                                    classList.add(Class.forName(className));
-                                } catch (ClassNotFoundException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                        //endregion
-                    }
-                    //endregion
-                }
-            }
-            //endregion
-        });
-        //endregion
-        List<ApiDoc> docs = new ArrayList<>();
-        classList.forEach(item -> {
-            //检测类
-            if (!item.isAnnotationPresent(Api.class)) return;
-            Api api = item.getAnnotation(Api.class);
-            ApiDoc apiDoc = new ApiDoc(api, item.getName());
+        DocScan2(path, appname, version, description, packageNames);
+    }
 
-            List<ApiMethodDoc> apiMethodDocs = new ArrayList<>();
+    /**
+     *
+     * @param path
+     * @param appname appname + version 确定一份API文档
+     * @param version
+     * @param description
+     * @param packageNames
+     */
+    public static void DocScan2(String path, String appname, String version, String description, String... packageNames){
+        List<ApiDoc> docs = Utils.readList(packageNames);
 
-            //region 解析方法
-            List<Method> methods = Arrays.asList(item.getMethods());
-            methods.forEach(method -> {
-                if (!method.isAnnotationPresent(ApiMethod.class)) return;
-
-                ApiMethod apiMethod = method.getDeclaredAnnotation(ApiMethod.class);
-                ApiMethodDoc apiMethodDoc = new ApiMethodDoc(apiMethod, method.getName());
-                apiMethodDoc.setPath(api.path() + (apiMethod.path().startsWith("/") ? apiMethod.path() : ("/" + apiMethod.path())));
-
-                //region 获取注解 参数、异常、返回值
-                List<ApiParam> apiParamList = new ArrayList<>();
-                List<ApiException> apiExceptionList = new ArrayList<>();
-                ApiReturn apiReturn = method.getDeclaredAnnotation(ApiReturn.class);
-                Arrays.asList(method.getDeclaredAnnotations()).forEach(annotation -> {
-                    if (annotation.annotationType() == $ApiParams.class) {
-                        $ApiParams $apiParams = ($ApiParams) annotation;
-                        apiParamList.addAll(Arrays.asList($apiParams.value()));
-                    } else if (annotation.annotationType() == ApiParam.class) {
-                        apiParamList.add((ApiParam) annotation);
-                    }
-
-                    if (annotation.annotationType() == $ApiExceptions.class) {
-                        $ApiExceptions $apiExceptions = ($ApiExceptions) annotation;
-                        apiExceptionList.addAll(Arrays.asList($apiExceptions.value()));
-                    } else if (annotation.annotationType() == ApiException.class) {
-                        apiExceptionList.add((ApiException) annotation);
-                    }
-                });
-                //endregion
-
-                //region 检测并赋值 参数
-                List<ApiParamDoc> apiParamDocs = new ArrayList<>();
-                apiParamList.forEach(apiParam -> {
-                    String keyword = item.getName() + "." + method.getName() + "定义的apiParam：" + apiParam.name();
-                    if (apiParam.type() == List.class && apiParam.elementType() == byte.class) {
-                        throw new RuntimeException(keyword + "是List类型，但没有定义elementType!");
-                    }
-                    if (apiParam.type() != List.class && apiParam.elementType() != byte.class) {
-                        throw new RuntimeException(keyword + "不是List类型，但定义了elementType!");
-                    }
-                    if ((apiParam.type() == Map.class || apiParam.elementType() == Map.class) && apiParam.maps().length == 0) {
-                        throw new RuntimeException(keyword + "是Map类型，但没有定义maps!");
-                    }
-                    if (apiParam.type() != Map.class && apiParam.elementType() != Map.class && apiParam.maps().length > 0) {
-                        throw new RuntimeException(keyword + "不是Map类型，但定义了maps!");
-                    }
-
-                    ApiParamDoc apiParamDoc = new ApiParamDoc(apiParam);
-                    readApiParam(apiParamDoc, domain, apiParam.maps(), keyword);
-                    apiParamDocs.add(apiParamDoc);
-                });
-                apiMethodDoc.setParams(apiParamDocs);
-                //endregion
-
-                //region 检测并赋值 return
-                if (apiReturn != null) {
-                    String keyword = item.getName() + "." + method.getName() + "定义的ApiReturn";
-                    if (apiReturn.type() == List.class && apiReturn.elementType() == byte.class) {
-                        throw new RuntimeException(keyword + "是List类型，但没有定义elementType!");
-                    }
-                    if ((apiReturn.type() == Map.class || apiReturn.elementType() == Map.class) && apiReturn.maps().length == 0) {
-                        throw new RuntimeException(keyword + "是Map类型，但没有定义maps!");
-                    }
-                    ApiParamDoc apiParamDoc = new ApiParamDoc(apiReturn);
-                    readApiParam(apiParamDoc, domain, apiReturn.maps(), keyword);
-                    apiMethodDoc.setReturnValue(apiParamDoc);
-                }
-                //endregion
-
-                //region 赋值 异常
-                List<ApiExceptionDoc> ex = new ArrayList<>();
-                apiExceptionList.forEach(exception -> ex.add(new ApiExceptionDoc(exception)));
-                apiMethodDoc.setExceptions(ex);
-                //endregion
-
-                apiMethodDocs.add(apiMethodDoc);
-            });
-            //endregion
-
-            apiDoc.setMethods(apiMethodDocs);
-            docs.add(apiDoc);
-        });
+        //数据封装
         Map<String, Object> params = new HashMap<>();
         params.put("clz", JSON.toJSONString(docs));
         params.put("appname", appname);
@@ -241,8 +95,6 @@ public class DocUtil {
         params.put("description", description);
 
         Map<String, String> headers = new HashMap<>();
-        headers.put("authorization", "");
-
         String result = doPost(path, headers, params);
         log.info("提交API数据完毕,返回 : {},请浏览 {}?appname={}&version={}", result, path, appname, version);
     }
@@ -289,176 +141,4 @@ public class DocUtil {
         return result;
     }
 
-    private static void readDomain(ApiParamDoc apiParamDoc, String keyword, String domain) {
-        List<ApiParamDoc> apiMapDocs = new ArrayList<>();
-        Arrays.asList(apiParamDoc.getT().getDeclaredFields()).forEach(field -> {
-            ApiParamDoc apiParamDoc1;
-            if (field.isAnnotationPresent(ApiField.class)) {
-                ApiField apiField = field.getDeclaredAnnotation(ApiField.class);
-                if (field.getType().isAssignableFrom(List.class) && apiField.elementType() == byte.class) {
-                    throw new RuntimeException(keyword + " 字段：" + field.getName() + "是List类型，但没有定义elementType!");
-                }
-                if (!field.getType().isAssignableFrom(List.class) && apiField.elementType() != byte.class) {
-                    throw new RuntimeException(keyword + " 字段：" + field.getName() + "不是List类型，但定义了elementType!");
-                }
-                if (apiField.deprecated()) {
-                    return;
-                }
-                apiParamDoc1 = new ApiParamDoc(apiField, field);
-            } else {
-                apiParamDoc1 = new ApiParamDoc(null, field);
-            }
-            if (apiParamDoc1.getT().getName().contains(domain)) {
-                List<ApiParamDoc> apiMapDocs2 = new ArrayList<>();
-                Arrays.asList(apiParamDoc1.getT().getDeclaredFields()).forEach(field2 -> {
-                    ApiParamDoc apiParamDoc2;
-                    if (field2.isAnnotationPresent(ApiField.class)) {
-                        ApiField apiField2 = field2.getDeclaredAnnotation(ApiField.class);
-                        if (field2.getType().isAssignableFrom(List.class) && apiField2.elementType() == byte.class) {
-                            throw new RuntimeException(keyword + " 字段：" + field2.getName() + "是List类型，但没有定义elementType!");
-                        }
-                        if (!field2.getType().isAssignableFrom(List.class) && apiField2.elementType() != byte.class) {
-                            throw new RuntimeException(keyword + " 字段：" + field2.getName() + "不是List类型，但定义了elementType!");
-                        }
-                        if (apiField2.deprecated()) {
-                            return;
-                        }
-                        apiParamDoc2 = new ApiParamDoc(apiField2, field2);
-                    } else {
-                        apiParamDoc2 = new ApiParamDoc(null, field2);
-                    }
-                    apiMapDocs2.add(apiParamDoc2);
-                });
-                apiParamDoc1.setChildren(apiMapDocs2);
-            }
-            apiMapDocs.add(apiParamDoc1);
-        });
-        apiParamDoc.setChildren(apiMapDocs);
-    }
-
-    private static void readApiParam(ApiParamDoc apiParamDoc, String domain, ApiMap[] apiMaps, String keyword) {
-        //region 实体类
-        if (apiParamDoc.getT().getName().contains(domain)) {
-            readDomain(apiParamDoc, keyword, domain);
-        }
-        //endregion
-        else if (apiMaps.length > 0) {
-            List<ApiParamDoc> apiParamDocs = new ArrayList<>();
-            Arrays.asList(apiMaps).forEach(apiMap -> {
-                if (apiMap.type() == List.class && apiMap.elementType() == byte.class) {
-                    throw new RuntimeException(keyword + apiMap.name() + "是List类型，但没有定义elementType!");
-                }
-                if (apiMap.type() != List.class && apiMap.elementType() != byte.class) {
-                    throw new RuntimeException(keyword + apiMap.name() + "不是List类型，但定义了elementType!");
-                }
-                if ((apiMap.type() == Map.class || apiMap.elementType() == Map.class) && apiMap.maps().length == 0) {
-                    throw new RuntimeException(keyword + apiMap.name() + "是Map类型，但没有定义maps!");
-                }
-                if (apiMap.type() != Map.class && apiMap.elementType() != Map.class && apiMap.maps().length > 0) {
-                    throw new RuntimeException(keyword + apiMap.name() + "不是Map类型，但定义了maps!");
-                }
-                ApiParamDoc apiParamDoc1 = new ApiParamDoc(apiMap);
-                List<ApiParamDoc> apiParamDocs2 = new ArrayList<>();
-                Arrays.asList(apiMap.maps()).forEach(apiMap2 -> {
-                    if (apiMap2.type() == List.class && apiMap2.elementType() == byte.class) {
-                        throw new RuntimeException(keyword + apiMap2.name() + "是List类型，但没有定义elementType!");
-                    }
-                    if (apiMap2.type() != List.class && apiMap2.elementType() != byte.class) {
-                        throw new RuntimeException(keyword + apiMap2.name() + "不是List类型，但定义了elementType!");
-                    }
-
-                    ApiParamDoc apiParamDoc2 = new ApiParamDoc(apiMap2);
-
-                    if (apiParamDoc2.getT().getName().contains(domain)) {
-                        readDomain(apiParamDoc2, keyword, domain);
-                    } else {
-                        if ((apiMap2.type() == Map.class || apiMap2.elementType() == Map.class) && apiMap2.maps().length == 0) {
-                            throw new RuntimeException(keyword + apiMap2.name() + "是Map类型，但没有定义maps!");
-                        }
-                        if (apiMap2.type() != Map.class && apiMap2.elementType() != Map.class && apiMap2.maps().length > 0) {
-                            throw new RuntimeException(keyword + apiMap2.name() + "不是Map类型，但定义了maps!");
-                        }
-                        List<ApiParamDoc> apiParamDocs3 = new ArrayList<>();
-                        Arrays.asList(apiMap2.maps()).forEach(apiMap3 -> {
-                            if (apiMap3.type() == List.class && apiMap3.elementType() == byte.class) {
-                                throw new RuntimeException(keyword + apiMap3.name() + "是List类型，但没有定义elementType!");
-                            }
-                            if (apiMap3.type() != List.class && apiMap3.elementType() != byte.class) {
-                                throw new RuntimeException(keyword + apiMap3.name() + "不是List类型，但定义了elementType!");
-                            }
-
-                            ApiParamDoc apiParamDoc3 = new ApiParamDoc(apiMap3);
-                            if (apiParamDoc3.getT().getName().contains(domain)) {
-                                readDomain(apiParamDoc3, keyword, domain);
-                            }
-
-                            apiParamDocs3.add(apiParamDoc3);
-                        });
-                        apiParamDoc2.setChildren(apiParamDocs3);
-                    }
-                    apiParamDocs2.add(apiParamDoc2);
-                });
-                apiParamDoc1.setChildren(apiParamDocs2);
-                apiParamDocs.add(apiParamDoc1);
-            });
-            apiParamDoc.setChildren(apiParamDocs);
-        }
-    }
-
-    private static void addClass(List<Class<?>> classList, String packagePath, String packageName) {
-        File[] files = getClassFiles(packagePath);
-        if (files != null) {
-            Arrays.asList(files).forEach(file -> {
-                String fileName = file.getName();
-                if (file.isFile()) {
-                    String className = getClassName(packageName, fileName);
-                    try {
-                        classList.add(Class.forName(className));
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    String subPackagePath = getSubPackagePath(packagePath, fileName);
-                    String subPackageName = getSubPackageName(packageName, fileName);
-                    addClass(classList, subPackagePath, subPackageName);
-                }
-            });
-        }
-    }
-
-    private static File[] getClassFiles(String packagePath) {
-        return new File(packagePath).listFiles(file -> (file.isFile() && file.getName().endsWith(".class")) || file.isDirectory());
-    }
-
-    private static String getClassName(String packageName, String fileName) {
-        String className = fileName.substring(0, fileName.lastIndexOf("."));
-        if (isNotEmpty(packageName)) {
-            className = packageName + "." + className;
-        }
-        return className;
-    }
-
-    private static String getSubPackagePath(String packagePath, String filePath) {
-        String subPackagePath = filePath;
-        if (isNotEmpty(packagePath)) {
-            subPackagePath = packagePath + "/" + subPackagePath;
-        }
-        return subPackagePath;
-    }
-
-    private static String getSubPackageName(String packageName, String filePath) {
-        String subPackageName = filePath;
-        if (isNotEmpty(packageName)) {
-            subPackageName = packageName + "." + subPackageName;
-        }
-        return subPackageName;
-    }
-
-    private static boolean isEmpty(String str) {
-        return str == null || str.length() == 0;
-    }
-
-    private static boolean isNotEmpty(String str) {
-        return !isEmpty(str);
-    }
 }

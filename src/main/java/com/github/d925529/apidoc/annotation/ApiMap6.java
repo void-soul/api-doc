@@ -22,18 +22,20 @@ limitations under the License.
 
 import java.lang.annotation.*;
 
-/**
- * 字段
- */
-@Target(ElementType.FIELD)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface ApiField {
+public @interface ApiMap6 {
     /**
-     * 描述
+     * Map 元素的 K
      */
-    String value() default "";
+    String name();
+
+    /**
+     * Map 元素 K 的含义
+     */
+    String title();
 
     /**
      * 详细描述
@@ -41,30 +43,31 @@ public @interface ApiField {
     String[] description() default "";
 
     /**
-     * 禁用
-     */
-    boolean disabled() default false;
-
-    /**
-     * 必传、必定返回
+     * 是否必须传递/是否必定返回
      */
     boolean required() default true;
 
     /**
-     * 略过
+     * map元素 value 的类型
      */
-    boolean deprecated() default false;
+    Class<?> type();
 
     /**
      * map元素 value 的类型是List时，必须指定集合元素的类型： elementType
      */
     Class<?> elementType() default byte.class;
 
+    /**
+     * 是否废弃
+     */
+    boolean disabled() default false;
+
     String version() default "";
 
     /**
-     * 只有type或者elementType是Map.class时才有用
-     * 用来指明map的K-V
+     *
+     * map元素 value 或者 集合元素的类型是 Map 时
+     * 必须指定Map的K-V
      */
-    ApiMap[] maps() default {};
+    ApiMap7[] maps() default {};
 }

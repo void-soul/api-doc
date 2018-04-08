@@ -63,4 +63,11 @@ public @interface ApiMap3 {
     boolean disabled() default false;
 
     String version() default "";
+
+	/**
+     *
+     * map元素 value 或者 集合元素的类型是 Map 时
+     * 必须指定Map的K-V
+     */
+    ApiMap4[] maps() default {};
 }

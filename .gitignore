@@ -31,3 +31,4 @@ nbdist/
 /doc/build.rar
 /doc/build/
 *.rdb
+/node_modules

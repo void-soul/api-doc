@@ -4,7 +4,7 @@
 
     <groupId>com.github.d925529</groupId>
     <artifactId>apidoc</artifactId>
-    <version>0.0.5</version>
+    <version>0.2.1</version>
     <packaging>jar</packaging>
 
     <name>apidoc</name>

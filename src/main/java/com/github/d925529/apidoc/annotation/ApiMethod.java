@@ -62,9 +62,18 @@ public @interface ApiMethod {
 
     /**
      * 正常返回格式，即 {status : '',data :'',message}
-     *
      */
     boolean common() default true;
 
+    /**
+     * 版本号
+     * @return
+     */
     String version() default "";
+
+    /**
+     * 概要设计id
+     * @return
+     */
+    String profile() default "";
 }

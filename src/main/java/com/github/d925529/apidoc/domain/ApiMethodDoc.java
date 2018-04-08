@@ -36,6 +36,7 @@ public class ApiMethodDoc {
     private List<ApiParamDoc> params;
     private List<ApiExceptionDoc> exceptions;
     private String version;
+    private String profile;
 
 
     public ApiMethodDoc(ApiMethod method, String name){
@@ -47,6 +48,15 @@ public class ApiMethodDoc {
         this.setMethod(method.method().name());
         this.setCommon(method.common());
         this.setVersion(method.version());
+        this.setProfile(method.profile());
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 
     public String getVersion() {
