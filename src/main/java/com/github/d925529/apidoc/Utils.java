@@ -96,6 +96,7 @@ public class Utils {
                 ApiMethodDoc apiMethodDoc = new ApiMethodDoc(apiMethod, method.getName());
                 apiMethodDoc.setPath(api.path() + (apiMethod.path().startsWith("/") ? apiMethod.path() : ("/" + apiMethod.path())));
 
+
                 //region 获取注解 参数、异常、返回值
                 List<ApiParam> apiParamList = new ArrayList<>();
                 List<ApiException> apiExceptionList = new ArrayList<>();
@@ -122,7 +123,9 @@ public class Utils {
                 //region 检测并赋值 参数
                 List<ApiParamDoc> apiParamDocs = new ArrayList<>();
                 apiParamList.forEach(apiParam -> {
-                    ApiParamDoc apiParamDoc = new ApiParamDoc(apiParam, keyword);
+                    //本次方法防止递归
+                    Map<Class,Boolean> domainReadCache = new HashMap<>();
+                    ApiParamDoc apiParamDoc = new ApiParamDoc(apiParam, keyword,domainReadCache);
                     apiParamDocs.add(apiParamDoc);
                 });
                 apiMethodDoc.setParams(apiParamDocs);
@@ -130,7 +133,8 @@ public class Utils {
 
                 //region 检测并赋值 return
                 if (apiReturn != null) {
-                    ApiParamDoc apiParamDoc = new ApiParamDoc(apiReturn, keyword);
+                    Map<Class,Boolean> domainReadCache = new HashMap<>();
+                    ApiParamDoc apiParamDoc = new ApiParamDoc(apiReturn, keyword,domainReadCache);
                     apiMethodDoc.setReturnValue(apiParamDoc);
                 }
                 //endregion

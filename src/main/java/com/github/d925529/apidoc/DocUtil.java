@@ -47,9 +47,9 @@ import java.util.Map;
 public class DocUtil {
     private static final int HTTP_TIMEOUT = 60000;
     private static final String DEFAULT_CHART_SET = "UTF-8";
+    private static final int SUCCESS = 200;
     private static PoolingHttpClientConnectionManager connMgr;
     private static RequestConfig requestConfig;
-    private static final int SUCCESS = 200;
     private static Logger log = LoggerFactory.getLogger("API");
 
     static {
@@ -77,14 +77,13 @@ public class DocUtil {
     }
 
     /**
-     *
      * @param path
-     * @param appname appname + version 确定一份API文档
+     * @param appname      appname + version 确定一份API文档
      * @param version
      * @param description
      * @param packageNames
      */
-    public static void DocScan2(String path, String appname, String version, String description, String... packageNames){
+    public static void DocScan2(String path, String appname, String version, String description, String... packageNames) {
         List<ApiDoc> docs = Utils.readList(packageNames);
 
         //数据封装

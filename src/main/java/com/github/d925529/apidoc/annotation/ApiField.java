@@ -67,4 +67,15 @@ public @interface ApiField {
      * 用来指明map的K-V
      */
     ApiMap[] maps() default {};
+
+    /**
+     * 这个字段只用来参数传入值,方法返回时不会有此字段
+     * @return
+     */
+    boolean onlyIn() default false;
+    /**
+     * 这个字段只用来返回值,调用方法时不需要传此字段
+     * @return
+     */
+    boolean onlyOut() default false;
 }

@@ -36,6 +36,7 @@
             margin: 10px 0;
             font-size: 14px;
         }
+
     </style>
 </head>
 <body>
@@ -77,7 +78,7 @@
                         <el-tag type="danger">{{item.code}}</el-tag>
                         启动
                         9:53:04 am
-                        安装爬虫                 ：
+                        安装爬虫 ：
                         <el-tag type="info" v-for="(item2,index2) in item.description" :key="index2">{{item2}}</el-tag>
                     </el-row>
                 </el-form-item>
@@ -104,20 +105,36 @@
                 <span v-else></span>
             </template>
         </el-table-column>
-        <el-table-column prop="disabled" label="特征&名称" width="280">
+        <el-table-column prop="disabled" label="特征&名称">
             <template slot-scope="scope">
-                <el-tag type="danger" v-if="scope.row.version && scope.row.version >= version">new</el-tag>
-                <el-tag type="danger" v-if="scope.row.children && scope.row.children.length > 0">
-                    子
-                    <span v-if="scope.row.elementType != 'byte'">{{scope.row.elementType}}</span>
-                </el-tag>
-                <el-tag type="info" v-if="scope.row.disabled">废</el-tag>
-                <el-tag v-if="scope.row.required" type="success">必</el-tag>
-                <el-tag v-else>选</el-tag>
+                <el-tooltip content="本次新增" placement="top" v-if="scope.row.version && scope.row.version >= version">
+                    <el-tag type="danger">new</el-tag>
+                </el-tooltip>
+                <el-tooltip content="是数组,有子元素↓" placement="top" v-if="scope.row.elementType != 'byte'">
+                    <el-tag type="danger">
+                        子
+                        <span>{{scope.row.elementType}}</span>
+                    </el-tag>
+                </el-tooltip>
+                <el-tooltip content="仅用于调用时传入参数" placement="top" v-if="scope.row.onlyIn">
+                    <el-tag type="info">入</el-tag>
+                </el-tooltip>
+                <el-tooltip content="仅用于调用时返回" placement="top" v-if="scope.row.onlyOut">
+                    <el-tag type="info">出</el-tag>
+                </el-tooltip>
+                <el-tooltip content="已经作废，但为了保证数据结构稳定，不做删除" placement="top" v-if="scope.row.disabled">
+                    <el-tag type="info">废</el-tag>
+                </el-tooltip>
+                <el-tooltip content="查询时必定有值，调用时必须传入" placement="top" v-if="scope.row.required">
+                    <el-tag  type="success">必</el-tag>
+                </el-tooltip>
+                <el-tooltip content="查询时可能有值，调用时可选择性传入" placement="top" v-else>
+                    <el-tag>选</el-tag>
+                </el-tooltip>
                 {{scope.row.name}}
             </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" width="180"/>
+        <el-table-column prop="type" label="类型" width="230"/>
         <el-table-column prop="title" label="含义" width="100"/>
         <el-table-column prop="description" label="详解" width="350">
             <template slot-scope="scope">
@@ -130,6 +147,7 @@
 </script>
 <script>
     var clz = <%- clz %>;
+
 </script>
 <script>
     new Vue({
@@ -179,6 +197,7 @@
             }
         }
     })
+
 </script>
 </body>
 </html>
