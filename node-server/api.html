@@ -1,112 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title><%- appname %>(<%- version %>)</title>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue" charset="UTF-8"></script>
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-    <style>
-        .el-header, .el-footer {
-            background-color: #B3C0D1;
-            color: #333;
-        }
+  <meta charset="UTF-8">
+  <title>
+    <%- appname %>(
+      <%- version %>)</title>
+  <script type="text/javascript"
+          src="https://cdn.jsdelivr.net/npm/vue"
+          charset="UTF-8"></script>
+  <link rel="stylesheet"
+        href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <style>
+    .el-header,
+    .el-footer {
+      background-color: #B3C0D1;
+      color: #333;
+    }
 
-        .el-main {
-            background-color: #E9EEF3;
-            color: #333;
-        }
+    .el-main {
+      background-color: #E9EEF3;
+      color: #333;
+    }
 
-        body > .el-container {
-            margin-bottom: 40px;
-        }
+    body>.el-container {
+      margin-bottom: 40px;
+    }
 
-        .el-container:nth-child(5) .el-aside,
-        .el-container:nth-child(6) .el-aside {
-        }
+    .el-tree-node {
+      font-size: 14px;
+    }
 
-        .el-container:nth-child(7) .el-aside {
-        }
+    .tree-tag {
+      height: 20px;
+      line-height: 20px
+    }
 
-        .el-table__expanded-cell[class*=cell] {
-            padding: 10px 20px;
-        }
+    .el-table__expanded-cell[class*=cell] {
+      padding: 10px 20px;
+    }
 
-        .el-alert {
-            margin: 10px 0;
-            font-size: 14px;
-        }
-
-    </style>
+    .el-alert {
+      margin: 10px 0;
+      font-size: 14px;
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="app">
+  <div id="app">
     <el-container>
-        <el-aside width="300px" v-auto-height>
-            <el-switch
-                    v-model="i18n"
-                    active-text="中文"
-                    inactive-text="路径">
-            </el-switch>
-            <el-alert title="<%- appname %>(<%- version %>),<%= description %>" type="success" :closable="false" show-icon style="margin-top: 10px"></el-alert>
+      <el-aside width="300px"
+                v-auto-height>
+        <el-switch v-model="i18n"
+                   active-text="中文"
+                   inactive-text="路径">
+        </el-switch>
+        <el-alert title="<%- appname %>(<%- version %>),<%= description %>"
+                  type="success"
+                  :closable="false"
+                  show-icon
+                  style="margin-top: 10px"></el-alert>
 
-            <el-tree v-show="i18n" v-auto-height :data="clzs" :props="props" @node-click="handleNodeClick"></el-tree>
-            <el-tree v-show="!i18n" v-auto-height :data="clzs" :props="props2" @node-click="handleNodeClick"></el-tree>
-        </el-aside>
-        <el-main v-if="method.method">
-            <el-tag type="info" v-if="method.disabled">废</el-tag>
-            <el-tag type="danger" v-if="method.version && method.version >= clz.version">new</el-tag>
-            <el-tag>{{method.method}}</el-tag>
-            <el-tag>{{method.path}}</el-tag>
-            <el-alert type="info" v-if="method.common" title="返回结果说明" :closable="false" show-icon description="该接口符合标准数据结构，服务将返回{data : 数据,status : 执行结果,message : 错误信息} ; status = 0 时，data = 下述中的 【返回值】,message 无效 ; status != 0 时，data 无效,message 返回 下述【异常】中 status对应的【文字描述】">
-            </el-alert>
-            <el-alert v-else type="warning" show-icon :closable="false" title="【返回结果说明】" description="该接口是特殊数据结构，服务直接返回下述中【返回值】">
-            </el-alert>
-            <el-form label-width="60px" size="mini">
-                <el-form-item label="方法：">
-                    {{method.title}}({{clz.name}}.{{method.name}})
-                </el-form-item>
-                <el-form-item label="描述：">
-                    <el-row v-for="(item,index) in method.description" :key="index">
-                        {{item}}
-                    </el-row>
-                </el-form-item>
-                <el-form-item label="异常：">
-                    <el-row v-for="(item,index) in method.exceptions" :key="index" style="margin: 0 0 10px 0">
-                        <el-tag type="danger" v-if="item.version && item.version >= method.version">new</el-tag>
-                        <el-tag type="danger">{{item.code}}</el-tag>
-                        启动
-                        9:53:04 am
-                        安装爬虫 ：
-                        <el-tag type="info" v-for="(item2,index2) in item.description" :key="index2">{{item2}}</el-tag>
-                    </el-row>
-                </el-form-item>
-                <el-form-item label="参数：" v-if="method.params && method.params.length > 0">
-                    <children-params :items="method.params" :version="method.version"></children-params>
-                </el-form-item>
-                <el-form-item label="返回：" v-if="method.returnValue">
-                    <children-params :items="[method.returnValue]" :version="method.version"></children-params>
-                </el-form-item>
-            </el-form>
-        </el-main>
-        <el-main v-else>
-            在左边选择方法进行查看
-        </el-main>
+        <el-tree v-show="i18n"
+                 :data="clzs"
+                 :props="  props"
+                 @node-click="handleNodeClick">
+          <span slot-scope="{ node, data }">
+                <el-tag v-if="data.version" type="info">{{data.version}}</el-tag>
+                <el-tooltip v-if="data.group" class="item" effect="dark" content="接口分组" placement="right">
+                  <el-tag type="danger" class="tree-tag">{{data.group}}</el-tag>
+                </el-tooltip>
+                <span>{{ node.label }}</span>
+          </span>
+        </el-tree>
+        <el-tree v-show="!i18n"
+                 :data="clzs"
+                 :props="props2"
+                 @node-click="handleNodeClick">
+          <span slot-scope="{ node, data }">
+            <el-tag v-if="data.version" type="info">{{data.version}}</el-tag>
+            <el-tooltip v-if="data.group" class="item" effect="dark" content="接口分组" placement="right">
+              <el-tag type="danger" class="tree-tag">{{data.group}}</el-tag>
+            </el-tooltip>
+            <span>{{ node.label }}</span>
+          </span>
+        </el-tree>
+      </el-aside>
+      <el-main v-if="method.method">
+        <el-tag type="info"
+                v-if="method.disabled">废</el-tag>
+        <el-tag type="danger"
+                v-if="method.version && method.version >= clz.version">new</el-tag>
+        <el-tag>{{method.method}}</el-tag>
+        <el-tag>{{method.path}}</el-tag>
+        <el-alert type="info"
+                  v-if="method.common"
+                  title="返回结果说明"
+                  :closable="false"
+                  show-icon
+                  description="该接口符合标准数据结构，服务将返回{data : 数据,status : 执行结果,message : 错误信息} ; status = 0 时，data = 下述中的 【返回值】,message 无效 ; status != 0 时，data 无效,message 返回 下述【异常】中 status对应的【文字描述】">
+        </el-alert>
+        <el-alert v-else
+                  type="warning"
+                  show-icon
+                  :closable="false"
+                  title="【返回结果说明】"
+                  description="该接口是特殊数据结构，服务直接返回下述中【返回值】">
+        </el-alert>
+        <el-form label-width="60px"
+                 size="mini">
+          <el-form-item label="方法：">
+            {{method.title}}({{clz.name}}.{{method.name}})
+          </el-form-item>
+          <el-form-item label="描述：">
+            <el-row v-for="(item,index) in method.description"
+                    :key="index">
+              {{item}}
+            </el-row>
+          </el-form-item>
+          <el-form-item label="异常：">
+            <el-row v-for="(item,index) in method.exceptions"
+                    :key="index"
+                    style="margin: 0 0 10px 0">
+              <el-tag type="danger"
+                      v-if="item.version && item.version >= method.version">new</el-tag>
+              <el-tag type="danger">{{item.code}}</el-tag>
+              <el-tag type="info"
+                      v-for="(item2,index2) in item.description"
+                      :key="index2">{{item2}}</el-tag>
+            </el-row>
+          </el-form-item>
+          <el-form-item label="参数："
+                        v-if="method.params && method.params.length > 0">
+            <el-tabs type="border-card">
+              <el-tab-pane label="文档">
+                <children-params :items="method.params"
+                                 :version="method.version"></children-params>
+              </el-tab-pane>
+              <el-tab-pane label="Vue"></el-tab-pane>
+              <el-tab-pane label="Ios"></el-tab-pane>
+              <el-tab-pane label="Android"></el-tab-pane>
+            </el-tabs>
+          </el-form-item>
+          <el-form-item label="返回："
+                        v-if="method.returnValue">
+            <el-tabs type="border-card">
+              <el-tab-pane label="文档">
+                <children-params :items="[method.returnValue]"
+                                 :version="method.version"></children-params>
+              </el-tab-pane>
+              <el-tab-pane label="Vue">
+              </el-tab-pane>
+              <el-tab-pane label="Ios"></el-tab-pane>
+              <el-tab-pane label="Android"></el-tab-pane>
+            </el-tabs>
+          </el-form-item>
+        </el-form>
+      </el-main>
+      <el-main v-else>
+        在左边选择方法进行查看
+      </el-main>
     </el-container>
-</div>
+  </div>
 
 
-<script type="text/html" id="children-params-temptel">
-    <el-table :data="items" stripe border size="mini" highlight-current-row style="width:100%">
-        <el-table-column type="expand" prop="name" label="名称">
-            <template slot-scope="scope">
+  <script type="text/html"
+          id="children-params-temptel">
+    <el-table :data="items"
+              stripe
+              border
+              size="mini"
+              highlight-current-row
+              style="width:100%">
+      <el-table-column type="expand"
+                       prop="name"
+                       label="名称">
+        <template slot-scope="scope">
                 <children-params v-if="scope.row.children && scope.row.children.length > 0" :items="scope.row.children" :version="scope.row.version"></children-params>
                 <span v-else></span>
             </template>
-        </el-table-column>
-        <el-table-column prop="disabled" label="特征&名称">
-            <template slot-scope="scope">
+      </el-table-column>
+      <el-table-column prop="disabled"
+                       label="特征&名称">
+        <template slot-scope="scope">
                 <el-tooltip content="本次新增" placement="top" v-if="scope.row.version && scope.row.version >= version">
                     <el-tag type="danger">new</el-tag>
                 </el-tooltip>
@@ -133,71 +212,83 @@
                 </el-tooltip>
                 {{scope.row.name}}
             </template>
-        </el-table-column>
-        <el-table-column prop="type" label="类型" width="230"/>
-        <el-table-column prop="title" label="含义" width="100"/>
-        <el-table-column prop="description" label="详解" width="350">
-            <template slot-scope="scope">
+      </el-table-column>
+      <el-table-column prop="type"
+                       label="类型"
+                       width="230" />
+      <el-table-column prop="title"
+                       label="含义"
+                       width="100" />
+      <el-table-column prop="description"
+                       label="详解"
+                       width="350">
+        <template slot-scope="scope">
                 <el-row v-for="(itemx,indexx) in scope.row.description" :key="indexx">
                     {{itemx}}
                 </el-row>
             </template>
-        </el-table-column>
+      </el-table-column>
     </el-table>
-</script>
-<script>
+  </script>
+  <script>
     var clz = <%- clz %>;
-
-</script>
-<script>
+  </script>
+  <script>
     new Vue({
-        el: '#app',
-        data: function () {
-            return {
-                props: {
-                    children: 'methods',
-                    label: 'title'
-                },
-                props2: {
-                    children: 'methods',
-                    label: 'path'
-                },
-                i18n: true,
-                clzs: clz,
-                method: {},
-                clz: {}
-            }
-        },
-        methods: {
-            handleNodeClick(data, node) {
-                if (node.parent.id > 0) {
-                    this.method = data;
-                    this.clz = node.parent.data;
-                }
-            }
-        },
-        directives: {
-            'auto-height': {
-                inserted: function (el, binding) {
-                    el.style.height = document.documentElement.clientHeight - el.getBoundingClientRect().top + (binding.value || 0) + 'px';
-                    el.style.maxHeight = document.documentElement.clientHeight - el.getBoundingClientRect().top + (binding.value || 0) + 'px';
-                    el.style.overflowY = 'auto';
-                }
-            }
-        },
-        components: {
-            'v-js-tree': window['ue-jstree'],
-            'children-params': {
-                name: 'children-params',
-                props: {
-                    items: {type: Array},
-                    version: {type: String}
-                },
-                template: document.getElementById("children-params-temptel").innerHTML
-            }
+      el: '#app',
+      data: function() {
+        return {
+          props: {
+            children: 'methods',
+            label: 'title'
+          },
+          props2: {
+            children: 'methods',
+            label: 'path'
+          },
+          i18n: true,
+          clzs: clz,
+          method: {},
+          clz: {}
         }
+      },
+      methods: {
+        handleNodeClick(data, node) {
+          if (node.parent.id > 0) {
+            this.method = data;
+            this.clz = node.parent.data;
+          }
+        }
+      },
+      directives: {
+        'auto-height': {
+          inserted: function(el, binding) {
+            el.style.height = document.documentElement.clientHeight - el.getBoundingClientRect()
+              .top + (binding.value || 0) + 'px';
+            el.style.maxHeight = document.documentElement.clientHeight -
+              el.getBoundingClientRect().top + (binding.value || 0) +
+              'px';
+            el.style.overflowY = 'auto';
+          }
+        }
+      },
+      components: {
+        'v-js-tree': window['ue-jstree'],
+        'children-params': {
+          name: 'children-params',
+          props: {
+            items: {
+              type: Array
+            },
+            version: {
+              type: String
+            }
+          },
+          template: document.getElementById("children-params-temptel").innerHTML
+        }
+      }
     })
-
-</script>
+  </script>
 </body>
+
 </html>
