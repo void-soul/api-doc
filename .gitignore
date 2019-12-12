@@ -1,0 +1,34 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.pdb
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+node_modules
+
+### NetBeans ###
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+/doc/sql_design/*.pdb
+/.editorconfig
+/config/config-service/src/main/resources/generator/config.properties
+
+### mac ###
+.DS_Store
+/doc/build.rar
+/doc/build/
+*.rdb
+/node_modules

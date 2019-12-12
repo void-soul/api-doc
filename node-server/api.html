@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>
+    <%- appname %>(
+      <%- version %>)</title>
+  <script type="text/javascript"
+          src="https://cdn.jsdelivr.net/npm/vue"
+          charset="UTF-8"></script>
+  <link rel="stylesheet"
+        href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <style>
+    .el-header,
+    .el-footer {
+      background-color: #B3C0D1;
+      color: #333;
+    }
+
+    .el-main {
+      background-color: #E9EEF3;
+      color: #333;
+    }
+
+    body>.el-container {
+      margin-bottom: 40px;
+    }
+
+    .el-tree-node {
+      font-size: 14px;
+    }
+
+    .tree-tag {
+      height: 20px;
+      line-height: 20px
+    }
+
+    .el-table__expanded-cell[class*=cell] {
+      padding: 10px 20px;
+    }
+
+    .el-alert {
+      margin: 10px 0;
+      font-size: 14px;
+    }
+
+    .el-input {
+      display: flex;
+      justify-content: center;
+      align-items: center
+    }
+
+    .el-input__inner {
+      width: 80%;
+      height: 30px;
+      line-height: 30px;
+    }
+
+    .tip-empty {
+      display: flex;
+      justify-content: center;
+      align-items: center
+    }
+
+    .empty-alert {
+      width: 300px
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <el-container>
+      <el-aside width="300px"
+                v-auto-height>
+        <el-switch v-model="i18n"
+                   active-text="中文"
+                   inactive-text="路径">
+        </el-switch>
+        <el-alert title="<%- appname %>(<%- version %>),<%= description %>"
+                  type="success"
+                  :closable="false"
+                  show-icon
+                  style="margin-top: 10px"></el-alert>
+        <el-input placeholder="输入关键字进行过滤"
+                  v-model="filterText">
+        </el-input>
+        <el-tree v-show="i18n"
+                 ref="tree1"
+                 :data="clzs"
+                 :props="props"
+                 :filter-node-method="filterNode"
+                 @node-click="handleNodeClick">
+          <span slot-scope="{ node, data }">
+                <el-tag v-if="data.version" type="info">{{data.version}}</el-tag>
+                <el-tooltip v-if="data.group" class="item" effect="dark" content="接口分组" placement="right">
+                  <el-tag type="danger" class="tree-tag">{{data.group}}</el-tag>
+                </el-tooltip>
+                <span>{{ node.label }}</span>
+          </span>
+        </el-tree>
+        <el-tree v-show="!i18n"
+                 ref="tree2"
+                 :data="clzs"
+                 :props="props2"
+                 :filter-node-method="filterNode"
+                 @node-click="handleNodeClick">
+          <span slot-scope="{ node, data }">
+            <el-tag v-if="data.version" type="info">{{data.version}}</el-tag>
+            <el-tooltip v-if="data.group" class="item" effect="dark" content="接口分组" placement="right">
+              <el-tag type="danger" class="tree-tag">{{data.group}}</el-tag>
+            </el-tooltip>
+            <span>{{ node.label }}</span>
+          </span>
+        </el-tree>
+      </el-aside>
+      <el-main v-if="method.method">
+        <el-tag type="info"
+                v-if="method.disabled">废</el-tag>
+        <el-tag type="danger"
+                v-if="method.version && method.version >= clz.version">new</el-tag>
+        <el-tag>{{method.method}}</el-tag>
+        <el-tag>{{method.path}}</el-tag>
+        <el-alert type="info"
+                  v-if="method.common"
+                  title="返回结果说明"
+                  :closable="false"
+                  show-icon
+                  description="该接口符合标准数据结构，服务将返回{data : 数据,status : 执行结果,message : 错误信息} ; status = 0 时，data = 下述中的 【返回值】,message 无效 ; status != 0 时，data 无效,message 返回 下述【异常】中 status对应的【文字描述】">
+        </el-alert>
+        <el-alert v-else
+                  type="warning"
+                  show-icon
+                  :closable="false"
+                  title="【返回结果说明】"
+                  description="该接口是特殊数据结构，服务直接返回下述中【返回值】">
+        </el-alert>
+        <el-form label-width="60px"
+                 size="mini">
+          <el-form-item label="方法：">
+            {{method.title}}({{clz.name}}.{{method.name}})
+          </el-form-item>
+          <el-form-item label="描述：">
+            <el-row v-for="(item,index) in method.description"
+                    :key="index">
+              {{item}}
+            </el-row>
+          </el-form-item>
+          <el-form-item label="异常：">
+            <el-row v-for="(item,index) in method.exceptions"
+                    :key="index"
+                    style="margin: 0 0 10px 0">
+              <el-tag type="danger"
+                      v-if="item.version && item.version >= method.version">new</el-tag>
+              <el-tag type="danger">{{item.code}}</el-tag>
+              <el-tag type="info"
+                      v-for="(item2,index2) in item.description"
+                      :key="index2">{{item2}}</el-tag>
+            </el-row>
+          </el-form-item>
+          <el-form-item label="参数："
+                        v-if="method.params && method.params.length > 0">
+            <el-tabs type="border-card">
+              <el-tab-pane label="文档">
+                <children-params :items="method.params"
+                                 :version="method.version"></children-params>
+              </el-tab-pane>
+              <el-tab-pane label="Vue"></el-tab-pane>
+              <el-tab-pane label="Ios"></el-tab-pane>
+              <el-tab-pane label="Android"></el-tab-pane>
+            </el-tabs>
+          </el-form-item>
+          <el-form-item label="返回："
+                        v-if="method.returnValue">
+            <el-tabs type="border-card">
+              <el-tab-pane label="文档">
+                <children-params :items="[method.returnValue]"
+                                 :version="method.version"></children-params>
+              </el-tab-pane>
+              <el-tab-pane label="Vue">
+              </el-tab-pane>
+              <el-tab-pane label="Ios"></el-tab-pane>
+              <el-tab-pane label="Android"></el-tab-pane>
+            </el-tabs>
+          </el-form-item>
+        </el-form>
+      </el-main>
+      <el-main v-else>
+        <div class="tip-empty"
+             v-auto-height>
+          <el-alert center
+                    class="empty-alert"
+                    title="emmmm"
+                    description="在左边选择方法进行查看"
+                    :closable="false"
+                    type="warning"
+                    show-icon>
+          </el-alert>
+        </div>
+      </el-main>
+    </el-container>
+  </div>
+
+
+  <script type="text/html"
+          id="children-params-temptel">
+    <el-table :data="items"
+              stripe
+              border
+              size="mini"
+              highlight-current-row
+              style="width:100%">
+      <el-table-column type="expand"
+                       prop="name"
+                       label="名称">
+        <template slot-scope="scope">
+                <children-params v-if="scope.row.children && scope.row.children.length > 0" :items="scope.row.children" :version="scope.row.version"></children-params>
+                <span v-else></span>
+            </template>
+      </el-table-column>
+      <el-table-column prop="disabled"
+                       label="特征&名称">
+        <template slot-scope="scope">
+                <el-tooltip content="本次新增" placement="top" v-if="scope.row.version && scope.row.version >= version">
+                    <el-tag type="danger">new</el-tag>
+                </el-tooltip>
+                <el-tooltip content="是数组,有子元素↓" placement="top" v-if="scope.row.elementType != 'byte'">
+                    <el-tag type="danger">
+                        子
+                        <span>{{scope.row.elementType}}</span>
+                    </el-tag>
+                </el-tooltip>
+                <el-tooltip content="仅用于调用时传入参数" placement="top" v-if="scope.row.onlyIn">
+                    <el-tag type="info">入</el-tag>
+                </el-tooltip>
+                <el-tooltip content="仅用于调用时返回" placement="top" v-if="scope.row.onlyOut">
+                    <el-tag type="info">出</el-tag>
+                </el-tooltip>
+                <el-tooltip content="已经作废，但为了保证数据结构稳定，不做删除" placement="top" v-if="scope.row.disabled">
+                    <el-tag type="info">废</el-tag>
+                </el-tooltip>
+                <el-tooltip content="查询时必定有值，调用时必须传入" placement="top" v-if="scope.row.required">
+                    <el-tag  type="success">必</el-tag>
+                </el-tooltip>
+                <el-tooltip content="查询时可能有值，调用时可选择性传入" placement="top" v-else>
+                    <el-tag>选</el-tag>
+                </el-tooltip>
+                {{scope.row.name}}
+            </template>
+      </el-table-column>
+      <el-table-column prop="type"
+                       label="类型"
+                       width="230">
+        <template slot-scope="scope">
+          <el-tooltip class="item" effect="dark" :content="types[scope.row.type] || 'json对象'" placement="right">
+            <el-tag type="info">{{scope.row.type}}</el-tag>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column prop="title"
+                       label="含义"
+                       width="100" />
+      <el-table-column prop="description"
+                       label="详解"
+                       width="350">
+        <template slot-scope="scope">
+                <el-row v-for="(itemx,indexx) in scope.row.description" :key="indexx">
+                    {{itemx}}
+                </el-row>
+            </template>
+      </el-table-column>
+    </el-table>
+  </script>
+  <script>
+    var clz = <%- clz %>;
+  </script>
+  <script>
+    var types = {
+      'java.util.Map': 'json对象',
+      'java.util.List': 'json数组',
+      'java.lang.Integer': '整数(可空)',
+      'int': '整数',
+      'java.lang.Double': '浮点数(可空)',
+      'double': '浮点数',
+      'java.lang.String': '字符串',
+      'java.lang.Short': '整数(可空)',
+      'java.lang.short': '整数',
+      'java.lang.Long': '浮点数(可空)',
+      'long': '浮点数',
+      'java.lang.Float': '浮点数(可空)',
+      'float': '浮点数',
+      'java.lang.BigDecimal': '浮点数(可空)',
+      'java.util.Date': '日期',
+      'char': '字符串',
+      'java.lang.Number': '数字(可空)',
+      'java.lang.Boolean': '布尔(可空)',
+      'boolean': '布尔',
+      'java.lang.Byte': '比特(可空)',
+      'byte': '比特',
+      'java.util.HashMap': 'json对象',
+      'java.util.TreeMap': 'json对象',
+      'java.lang.StringBuilder': '字符串',
+      'java.lang.StringBuffer': '字符串'
+    };
+    new Vue({
+      el: '#app',
+      data: function() {
+        return {
+          props: {
+            children: 'methods',
+            label: 'title'
+          },
+          props2: {
+            children: 'methods',
+            label: 'path'
+          },
+          i18n: true,
+          clzs: clz,
+          method: {},
+          clz: {},
+          types: types,
+          filterText: null
+        }
+      },
+      watch: {
+        filterText(val) {
+          this.$refs[this.i18n ? 'tree1' : 'tree2'].filter(val);
+        }
+      },
+      methods: {
+        handleNodeClick(data, node) {
+          if (node.parent.id > 0) {
+            this.method = data;
+            this.clz = node.parent.data;
+          }
+        },
+        filterNode(value, data) {
+          if (!value) return true;
+          value = value.toLowerCase()
+          if (this.i18n) return data.title.toLowerCase().indexOf(value) !== -1;
+          else return data.path.toLowerCase().indexOf(value) !== -1;
+        }
+      },
+      directives: {
+        'auto-height': {
+          inserted: function(el, binding) {
+            el.style.height = document.documentElement.clientHeight - el.getBoundingClientRect()
+              .top + (binding.value || 0) + 'px';
+            el.style.maxHeight = document.documentElement.clientHeight -
+              el.getBoundingClientRect().top + (binding.value || 0) +
+              'px';
+            el.style.overflowY = 'auto';
+          }
+        }
+      },
+      components: {
+        'v-js-tree': window['ue-jstree'],
+        'children-params': {
+          name: 'children-params',
+          props: {
+            items: {
+              type: Array
+            },
+            version: {
+              type: String
+            }
+          },
+          template: document.getElementById("children-params-temptel").innerHTML
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
