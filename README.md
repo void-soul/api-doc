@@ -2,8 +2,6 @@
 
 # install
 
-
-
 ## java
 
 ```xml
@@ -24,9 +22,6 @@ vi api-server.js
 # please install pm2 first,or you can start by node
 pm2 start api-server.js
 ```
-
-
-
 
 # useage
 
@@ -120,13 +115,9 @@ this is a verv complex demo
     @ApiException(code = "207003", description = "商品ID对应商品不是在售状态")
 ```
 
-
 ## node
 
 1. open `http://127.0.0.1:848?appname=appname&version=version`(node server path) on chrome
 2. input your username/password,then you can see:
 
-![Alt text](https://github.com/d925529/apidoc/blob/master/doc/screencapture-doc-emeker-1510654151737.png?raw=true)
-
-
-
+![Alt text](https://github.com/void-soul/apidoc/blob/master/doc/screencapture-doc-emeker-1510654151737.png?raw=true)
